@@ -4,9 +4,17 @@
         <div class="container-fluid">
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <p class="navbar-text pull-left"><span class="octicon octicon-megaphone"
-                                                           style="color: #e49436; font-weight:bold; font-size:0.9em"> GET THE WORD OUT!</span>
-                    </p>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Service <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-header">GitPitch Git Services</li>
+                                <li><a href='@rndr.pageLink(false, "github")' data-value="github">GitHub</a></li>
+                                <li><a href='@rndr.pageLink(false, "gitlab")' data-value="github">GitLab</a></li>
+                                <li><a href='@rndr.pageLink(false, "bitbucket")' data-value="github">BitBucket</a></li>
+                            </ul>
+                    </li>
+
                     @if(!offline) {
                     <li>
                         <a href="#popupTheme" role="button" data-toggle="modal-popover" data-placement="top"><i

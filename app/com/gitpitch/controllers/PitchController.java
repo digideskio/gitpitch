@@ -117,11 +117,12 @@ public class PitchController extends Controller {
     public CompletionStage<Result> landing(String user,
                                            String repo,
                                            String branch,
+                                           String grs,
                                            String theme,
                                            String notes,
                                            String offline) {
 
-        PitchParams pp = PitchParams.build(user, repo, branch, theme, notes);
+        PitchParams pp = PitchParams.build(grs, user, repo, branch, theme, notes);
         boolean isOffline =
                 (offline == null) ? false : Boolean.parseBoolean(offline);
         Optional<GitRepoModel> grmo = pitchService.cachedRepo(pp);
@@ -173,7 +174,8 @@ public class PitchController extends Controller {
     /*
      * Slideshow builds and renders a GitPitch slideshow page.
      */
-    public CompletionStage<Result> slideshow(String user,
+    public CompletionStage<Result> slideshow(String grs,
+                                             String user,
                                              String repo,
                                              String branch,
                                              String theme,
@@ -181,7 +183,7 @@ public class PitchController extends Controller {
                                              String fragments,
                                              String offline) {
 
-        PitchParams pp = PitchParams.build(user, repo, branch, theme, notes);
+        PitchParams pp = PitchParams.build(grs, user, repo, branch, theme, notes);
         boolean printing =
                 (fragments == null) ? false : !Boolean.parseBoolean(fragments);
         boolean isOffline =
@@ -234,11 +236,12 @@ public class PitchController extends Controller {
     /*
      * Markdown processes and renders PITCHME.md markdown.
      */
-    public CompletionStage<Result> markdown(String user,
+    public CompletionStage<Result> markdown(String grs,
+                                            String user,
                                             String repo,
                                             String branch) {
 
-        PitchParams pp = PitchParams.build(user, repo, branch);
+        PitchParams pp = PitchParams.build(grs, user, repo, branch);
         Optional<MarkdownModel> mdmo = pitchService.cachedMarkdown(pp);
 
         if (mdmo.isPresent()) {
@@ -276,13 +279,14 @@ public class PitchController extends Controller {
     /*
      * Print generates and renders PITCHME.pdf.
      */
-    public CompletionStage<Result> print(String user,
+    public CompletionStage<Result> print(String grs,
+                                         String user,
                                          String repo,
                                          String branch,
                                          String theme,
                                          String notes) {
 
-        PitchParams pp = PitchParams.build(user, repo, branch, theme, notes);
+        PitchParams pp = PitchParams.build(grs, user, repo, branch, theme, notes);
         Optional<File> pdfo = pitchService.cachedPDF(pp);
 
         if (pdfo.isPresent()) {
@@ -316,13 +320,15 @@ public class PitchController extends Controller {
     /*
      * Offline generates and renders PITCHME.zip.
      */
-    public CompletionStage<Result> offline(String user,
+    public CompletionStage<Result> offline(String grs,
+                                           String user,
                                            String repo,
                                            String branch,
                                            String theme,
                                            String notes) {
+                                          
 
-        PitchParams pp = PitchParams.build(user, repo, branch, theme, notes);
+        PitchParams pp = PitchParams.build(grs, user, repo, branch, theme, notes);
         log.debug("print: pp={}", pp);
 
         Optional<File> zipo = pitchService.cachedZip(pp);

@@ -108,9 +108,12 @@ public class GitRepoModel {
                 .append(this._pp.repo)
                 .toString();
 
+/*
         this._cacheKey = new StringBuffer(MODEL_ID)
                 .append(this._pretty)
                 .toString();
+*/
+        this._cacheKey = genKey(pp);
 
         /*
          * Generate derived data on instance only if the GitHub
@@ -158,6 +161,8 @@ public class GitRepoModel {
     public static String genKey(PitchParams pp) {
 
         return new StringBuffer(MODEL_ID).append(SLASH)
+                .append(pp.grs)
+                .append(SLASH)
                 .append(pp.user)
                 .append(SLASH)
                 .append(pp.repo)

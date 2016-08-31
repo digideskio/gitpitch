@@ -115,6 +115,7 @@ public class GitService {
         } else {
 
             String apiCall = GitHub.repoAPI(pp);
+            log.debug("fetchRepo: apiCall={}", apiCall);
             final long start = System.currentTimeMillis();
 
             WSRequest apiRequest = wsClient.url(apiCall);
@@ -146,10 +147,11 @@ public class GitService {
                                     JsonNode json = apiResp.asJson();
                                     GitRepoModel grm = new GitRepoModel(pp, json);
 
-                            /*
-                             * Update pitchCache with new GitRepoModel
-                             * generated using GitHub API response data.
-                             */
+                                    /*
+                                     * Update pitchCache with new GitRepoModel
+                                     * generated using GitHub API response data.
+                                     */
+                                    log.debug("fetchRepo: updating cache, grmKey={}", grm.key());
                                     pitchCache.set(grm.key(), grm, cacheTimeout.grm(pp));
 
                                 } catch (Exception ex) {

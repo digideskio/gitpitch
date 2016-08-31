@@ -230,7 +230,8 @@ public class OfflineService {
     private int fetchOnlineMarkdown(PitchParams pp) {
 
         String murl =
-                com.gitpitch.controllers.routes.PitchController.markdown(pp.user,
+                com.gitpitch.controllers.routes.PitchController.markdown(pp.grs,
+                        pp.user,
                         pp.repo,
                         pp.branch)
                         .absoluteURL(isEncrypted(), hostname());
@@ -246,7 +247,8 @@ public class OfflineService {
     private int fetchLandingHTML(PitchParams pp, Path zipRoot) {
 
         String lurl =
-                com.gitpitch.controllers.routes.PitchController.landing(pp.user,
+                com.gitpitch.controllers.routes.PitchController.landing(pp.grs,
+                        pp.user,
                         pp.repo,
                         pp.branch,
                         pp.theme,
@@ -263,7 +265,8 @@ public class OfflineService {
     private int fetchSlideshowHTML(PitchParams pp, Path zipRoot) {
 
         String surl =
-                com.gitpitch.controllers.routes.PitchController.slideshow(pp.user,
+                com.gitpitch.controllers.routes.PitchController.slideshow(pp.grs,
+                        pp.user,
                         pp.repo,
                         pp.branch,
                         pp.theme,

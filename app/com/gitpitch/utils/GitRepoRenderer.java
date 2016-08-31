@@ -77,21 +77,24 @@ public class GitRepoRenderer {
              */
 
             this._landingURL = com.gitpitch.controllers.routes.PitchController
-                    .landing(_grm.owner(),
+                    .landing(_pp.grs,
+                            _grm.owner(),
                             _grm.name(),
                             _pp.branch,
                             _pp.theme,
                             _pp.notes, null).toString();
 
             this._slideshowURL = com.gitpitch.controllers.routes.PitchController
-                    .slideshow(_grm.owner(),
+                    .slideshow(_pp.grs,
+                            _grm.owner(),
                             _grm.name(),
                             _pp.branch,
                             _pp.theme,
                             _pp.notes, null, null).toString();
 
             this._markdownURL = com.gitpitch.controllers.routes.PitchController
-                    .markdown(_grm.owner(),
+                    .markdown(_pp.grs,
+                            _grm.owner(),
                             _grm.name(),
                             _pp.branch).toString();
 
@@ -202,7 +205,8 @@ public class GitRepoRenderer {
      * Return relative URL to landing view.
      */
     public String landingURL(String theme) {
-        return com.gitpitch.controllers.routes.PitchController.landing(_grm.owner(),
+        return com.gitpitch.controllers.routes.PitchController.landing(_pp.grs,
+                _grm.owner(),
                 _grm.name(),
                 _pp.branch,
                 theme,
@@ -300,19 +304,28 @@ public class GitRepoRenderer {
     }
 
     public String pageLink(boolean absolute) {
+        return pageLink(absolute, null);
+    }
+
+    public String pageLink(boolean absolute, String grs) {
+
+        grs = (grs != null) ? grs : _pp.grs;
 
         if (absolute)
             return com.gitpitch.controllers.routes.PitchController.landing(_pp.user,
                     _pp.repo,
                     _pp.branch,
+                    grs,
                     _pp.theme,
-                    _pp.notes, null)
+                    _pp.notes,
+                    null)
                     .absoluteURL(isEncrypted(),
                             hostname());
         else
             return com.gitpitch.controllers.routes.PitchController.landing(_pp.user,
                     _pp.repo,
                     _pp.branch,
+                    grs,
                     _pp.theme,
                     _pp.notes, null).toString();
     }
@@ -322,13 +335,16 @@ public class GitRepoRenderer {
         return com.gitpitch.controllers.routes.PitchController.landing(_pp.user,
                 _pp.repo,
                 _pp.branch,
+                _pp.grs,
                 theme,
-                _pp.notes, null).toString();
+                _pp.notes,
+                null).toString();
     }
 
     public String printLink() {
 
-        return com.gitpitch.controllers.routes.PitchController.print(_pp.user,
+        return com.gitpitch.controllers.routes.PitchController.print(_pp.grs,
+                _pp.user,
                 _pp.repo,
                 _pp.branch,
                 _pp.theme,
@@ -337,7 +353,8 @@ public class GitRepoRenderer {
 
     public String offlineLink() {
 
-        return com.gitpitch.controllers.routes.PitchController.offline(_pp.user,
+        return com.gitpitch.controllers.routes.PitchController.offline(_pp.grs,
+                _pp.user,
                 _pp.repo,
                 _pp.branch,
                 _pp.theme,

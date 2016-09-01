@@ -23,6 +23,7 @@
  */
 
 import com.gitpitch.factory.MarkdownModelFactory;
+import com.gitpitch.git.*;
 import com.gitpitch.models.Markdown;
 import com.gitpitch.models.MarkdownModel;
 import com.gitpitch.services.*;
@@ -49,6 +50,8 @@ public class Module extends AbstractModule {
         bind(ImageService.class).asEagerSingleton();
         bind(VideoService.class).asEagerSingleton();
         bind(GISTService.class).asEagerSingleton();
+        bind(GRSManager.class).asEagerSingleton();
+        bind(GitHub.class).asEagerSingleton();
         bind(FrontEndThreads.class).asEagerSingleton();
         bind(BackEndThreads.class).asEagerSingleton();
         bind(Dependencies.class).asEagerSingleton();

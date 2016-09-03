@@ -23,12 +23,29 @@
  */
 package com.gitpitch.git;
 
+import com.gitpitch.models.GitRepoModel;
 import com.gitpitch.utils.PitchParams;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /*
  * Git Respository Service common interface.
  */
 public interface GRSService {
+
+    /*
+     * Return true if apiPath is a call on this GRSService instance.
+     */
+    public boolean call(PitchParams pp, String apiPath);
+
+    /*
+     * Return zero if file download completes successfully.
+     */
+    public int download(PitchParams pp, String filename);
+
+    /*
+     * Return model representing Git repository meta-data.
+     */
+    public GitRepoModel model(PitchParams pp, JsonNode json);
 
     /*
      * Return Raw API path for /user/repo/branch.
@@ -50,10 +67,5 @@ public interface GRSService {
      * Return API path for repository meta call for /user/repo.
      */
     public String repo(PitchParams pp);
-
-    /*
-     * Return true if apiPath is valid call on this GRSService instance.
-     */
-    public boolean isValid(PitchParams pp, String apiPath);
 
 }

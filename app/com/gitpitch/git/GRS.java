@@ -25,6 +25,7 @@ package com.gitpitch.git;
 
 import com.gitpitch.utils.PitchParams;
 import java.util.Map;
+import java.util.HashMap;
 
 /*
  * Git Respository Service model.
@@ -35,6 +36,7 @@ public class GRS {
     private final String type;
     private final String apiBase;
     private final String apiToken;
+    private final String apiTokenHeader;
     private final String rawBase;
     private final boolean isDefault;
 
@@ -42,6 +44,7 @@ public class GRS {
                 String type,
                 String apiBase,
                 String apiToken,
+                String apiTokenHeader,
                 String rawBase,
                 boolean isDefault) {
 
@@ -49,6 +52,7 @@ public class GRS {
         this.type = type;
         this.apiBase = apiBase;
         this.apiToken = apiToken;
+        this.apiTokenHeader = apiTokenHeader;
         this.rawBase = rawBase;
         this.isDefault = isDefault;
     }
@@ -59,11 +63,13 @@ public class GRS {
         String type = grsCfg.get("type");
         String apiBase = grsCfg.get("apibase");
         String apiToken = grsCfg.get("apitoken");
+        String apiTokenHeader = grsCfg.get("apitokenheader");
         String rawBase = grsCfg.get("rawbase");
         boolean isDefault = Boolean.parseBoolean(grsCfg.get("default"));
 
         if(id != null && type != null && apiBase != null && rawBase != null) {
-            return new GRS(id, type, apiBase, apiToken, rawBase, isDefault);
+            return new GRS(id, type, apiBase, apiToken,
+                    apiTokenHeader, rawBase, isDefault);
         } else {
             return null;
         }
@@ -73,7 +79,20 @@ public class GRS {
     public String type() { return type; }
     public String apiBase() { return apiBase; }
     public String apiToken() { return apiToken; }
+    public String apiTokenHeader() { return apiTokenHeader; }
     public String rawBase() { return rawBase; }
     public boolean isDefault() { return isDefault; }
+
+    public Map<String,String> headers() {
+        Map<String,String> hdrs = new HashMap<String,String>();
+        if(apiToken() != null && apiTokenHeader() != null) {
+            hdrs.put(apiTokenHeader, apiToken);
+        }
+        return hdrs;
+    }
+
+    public String toString() {
+        return "GRS[ " + id + " ][ " + type + " ]";
+    }
 
 }

@@ -24,6 +24,7 @@
 package com.gitpitch.models;
 
 import com.gitpitch.models.MarkdownModel;
+import com.gitpitch.git.GRSService;
 import com.gitpitch.services.DiskService;
 import com.gitpitch.utils.PitchParams;
 import com.gitpitch.utils.YAMLOptions;
@@ -89,10 +90,11 @@ public class SlideshowModel {
 
     public static SlideshowModel build(PitchParams pp,
                                        boolean yamlFound,
+                                       GRSService grsService,
                                        DiskService diskService) {
 
         YAMLOptions yOpts =
-                yamlFound ? YAMLOptions.build(pp, diskService) : null;
+                yamlFound ? YAMLOptions.build(pp, grsService, diskService) : null;
         return new SlideshowModel(pp, yOpts);
     }
 

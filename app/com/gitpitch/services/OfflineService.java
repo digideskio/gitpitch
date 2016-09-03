@@ -24,6 +24,7 @@
 package com.gitpitch.services;
 
 import com.gitpitch.factory.MarkdownModelFactory;
+import com.gitpitch.git.*;
 import com.gitpitch.models.MarkdownModel;
 import com.gitpitch.models.SlideshowModel;
 import com.gitpitch.executors.BackEndThreads;
@@ -60,21 +61,24 @@ public class OfflineService {
 
     private final Logger.ALogger log = Logger.of(this.getClass());
 
-    private DiskService diskService;
-    private ShellService shellService;
-    private MarkdownModelFactory markdownModelFactory;
-    private BackEndThreads backEndThreads;
-    private Configuration configuration;
-    private Environment env;
+    private final GRSManager grsManager;
+    private final DiskService diskService;
+    private final ShellService shellService;
+    private final MarkdownModelFactory markdownModelFactory;
+    private final BackEndThreads backEndThreads;
+    private final Configuration configuration;
+    private final Environment env;
 
     @Inject
-    public OfflineService(DiskService diskService,
+    public OfflineService(GRSManager grsManager,
+                          DiskService diskService,
                           ShellService shellService,
                           MarkdownModelFactory markdownModelFactory,
                           BackEndThreads backEndThreads,
                           Configuration configuration,
                           Environment env) {
 
+        this.grsManager = grsManager;
         this.diskService = diskService;
         this.shellService = shellService;
         this.markdownModelFactory = markdownModelFactory;
@@ -238,7 +242,9 @@ public class OfflineService {
 
         Path zipMdPath =
                 diskService.ensure(diskService.asPath(pp, ZIP_MD_DIR));
-        return diskService.download(pp, zipMdPath, murl, PITCHME_ONLINE_MD);
+        return diskService.download(pp,
+                zipMdPath, murl, PITCHME_ONLINE_MD,
+                grsManager.get(pp).headers());
     }
 
     /*
@@ -256,7 +262,8 @@ public class OfflineService {
                         ENABLED)
                         .absoluteURL(isEncrypted(), hostname());
 
-        return diskService.download(pp, zipRoot, lurl, INDEX_HTML);
+        return diskService.download(pp, zipRoot,
+                lurl, INDEX_HTML, grsManager.get(pp).headers());
     }
 
     /*
@@ -275,7 +282,8 @@ public class OfflineService {
                         ENABLED)
                         .absoluteURL(isEncrypted(), hostname());
 
-        return diskService.download(pp, zipRoot, surl, SLIDESHOW_HTML);
+        return diskService.download(pp, zipRoot,
+                surl, SLIDESHOW_HTML, grsManager.get(pp).headers());
     }
 
     /*
@@ -325,8 +333,11 @@ public class OfflineService {
 
         if (mdOnlineFile.exists()) {
 
+            GRSService grsService =
+                grsManager.getService(grsManager.get(pp));
+
             MarkdownRenderer mrndr = 
-                MarkdownRenderer.build(pp, ssmo, diskService);
+                MarkdownRenderer.build(pp, ssmo, grsService, diskService);
 
             MarkdownModel markdownModel =
                 (MarkdownModel) markdownModelFactory.create(mrndr);
@@ -387,9 +398,9 @@ public class OfflineService {
                 for (String assetUrl : assetUrls) {
                     if (assetUrl != null &&
                             !fetched.contains(assetUrl)) {
-                        diskService.download(pp, zipMdAssetsPath,
-                                assetUrl,
-                                FilenameUtils.getName(assetUrl));
+                        diskService.download(pp, zipMdAssetsPath, assetUrl,
+                            FilenameUtils.getName(assetUrl),
+                            grsManager.get(pp).headers());
                         fetched.add(assetUrl);
                     }
                 }
@@ -408,7 +419,9 @@ public class OfflineService {
      */
     private void fetchYAMLDependencies(PitchParams pp) {
 
-        YAMLOptions yOpts = YAMLOptions.build(pp, diskService);
+        GRSService grsService =
+                grsManager.getService(grsManager.get(pp));
+        YAMLOptions yOpts = YAMLOptions.build(pp, grsService, diskService);
         log.debug("fetchYAMLDependencies: yOpts={}", yOpts);
 
         try {
@@ -420,7 +433,8 @@ public class OfflineService {
                 Path zipAssetsPath =
                         diskService.ensure(diskService.asPath(pp,
                                 ZIP_ASSETS_DIR));
-                diskService.download(pp, zipAssetsPath, logoUrl, logoName);
+                diskService.download(pp, zipAssetsPath,
+                        logoUrl, logoName, grsManager.get(pp).headers());
                 log.debug("fetchYAMLDependencies: downloaded logo={}", logoUrl);
             }
 

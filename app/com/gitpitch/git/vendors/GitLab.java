@@ -21,12 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.gitpitch.git;
+package com.gitpitch.git.vendors;
 
-import com.gitpitch.git.GRS;
-import com.gitpitch.git.GRSManager;
-import com.gitpitch.git.GRSService;
+import com.gitpitch.git.*;
+import com.gitpitch.models.*;
+import com.gitpitch.services.DiskService;
 import com.gitpitch.utils.PitchParams;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.nio.file.Path;
 import javax.inject.*;
 import play.Logger;
 import play.Logger.ALogger;
@@ -35,30 +37,69 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /*
- * GitHub API Service.
+ * GitLab API Service.
  */
 @Singleton
-public class GitHub implements GRSService {
+public class GitLab implements GRSService {
 
     private final Logger.ALogger log = Logger.of(this.getClass());
 
     private final AtomicInteger cacheBypass = new AtomicInteger();
-    private final GRSManager grsManager;
+    private GRSManager grsManager;
+    private DiskService diskService;
 
-    @Inject
-    public GitHub(GRSManager grsManager) {
+    public void init(GRSManager grsManager,
+                     DiskService diskService) {
         this.grsManager = grsManager;
+        this.diskService = diskService;
+    }
+
+    public boolean call(PitchParams pp, String apiPath) {
+
+        if(apiPath != null) {
+            GRS grs = grsManager.get(pp);
+            return apiPath.startsWith(grs.apiBase()) ||
+                    apiPath.startsWith(grs.rawBase());
+        } else {
+            return false;
+        }
+    }
+
+    public int download(PitchParams pp, String filename) {
+
+        int status = 999;
+
+        GRS grs = grsManager.get(pp);
+        GRSService grsService = grsManager.getService(grs);
+        Path branchPath = diskService.ensure(pp);
+        String gitLabLink = raw(pp, filename, true);
+        log.debug("download: gitLabLink={}", gitLabLink);
+
+        if (grsService.call(pp, gitLabLink)) {
+            status = diskService.download(pp,
+                                          branchPath,
+                                          gitLabLink,
+                                          filename,
+                                          grs.headers());
+        }
+
+        log.debug("download: returning status={}", status);
+        return status;
+    }
+
+    public GitRepoModel model(PitchParams pp, JsonNode json) {
+        return GitLabRepoModel.build(pp, json);
     }
 
     public String raw(PitchParams pp) {
 
-        GRS grs = grsManager.get(pp.grs);
+        GRS grs = grsManager.get(pp);
 
         return new StringBuffer(grs.rawBase())
                 .append(pp.user)
                 .append(SLASH)
                 .append(pp.repo)
-                .append(SLASH)
+                .append(GITLAB_RAW)
                 .append(pp.branch)
                 .append(SLASH)
                 .toString();
@@ -82,27 +123,30 @@ public class GitHub implements GRSService {
 
     public String repo(PitchParams pp) {
 
-        GRS grs = grsManager.get(pp.grs);
+        GRS grs = grsManager.get(pp);
 
         return new StringBuffer(grs.apiBase())
-                .append(GITHUB_REPO_API)
-                .append(pp.user)
-                .append(SLASH)
-                .append(pp.repo)
+                .append(GITLAB_PROJECTS_API)
+                .append(genProjectId(pp))
                 .toString();
     }
 
-    public boolean isValid(PitchParams pp, String apiPath) {
+    private String genProjectId(PitchParams pp) {
 
-        if(apiPath != null) {
-            GRS grs = grsManager.get(pp.grs);
-            return apiPath.startsWith(grs.apiBase()) ||
-                    apiPath.startsWith(grs.rawBase());
-        } else {
-            return false;
-        }
+        String userRepo =
+            new StringBuffer(pp.user).append(SLASH)
+                                     .append(pp.repo)
+                                     .toString();
+
+        String pid = java.net.URLEncoder.encode(userRepo);
+        log.debug("genProjectId: pid={}", pid);
+        return pid;
     }
 
+    public static final String TYPE = "gitlab";
+
     private static final String SLASH = "/";
-    private static final String GITHUB_REPO_API = "repo/";
+    private static final String GITLAB_PROJECTS_API = "projects/";
+    private static final String GITLAB_RAW = "/raw/";
+
 }

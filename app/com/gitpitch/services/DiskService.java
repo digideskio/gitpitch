@@ -23,7 +23,9 @@
  */
 package com.gitpitch.services;
 
-import com.gitpitch.utils.GitHub;
+import com.gitpitch.git.GRS;
+import com.gitpitch.git.GRSService;
+import com.gitpitch.git.GRSManager;
 import com.gitpitch.utils.PitchParams;
 import org.apache.commons.io.FileUtils;
 import play.Configuration;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Map;
 
 /*
  * File system storage service.
@@ -48,16 +51,17 @@ public class DiskService {
     private final String _storage;
     private final String _decktape;
     private final String _rawAuthToken;
-    private Configuration configuration;
-    private ShellService shellService;
-    private WSClient ws;
+    private final ShellService shellService;
+    private final Configuration configuration;
+    private final WSClient ws;
 
     @Inject
-    public DiskService(Configuration configuration,
-                       ShellService shellService,
+    public DiskService(ShellService shellService,
+                       Configuration configuration,
                        WSClient ws) {
-        this.configuration = configuration;
+
         this.shellService = shellService;
+        this.configuration = configuration;
         this.ws = ws;
         this._storage = configuration.getString("gitpitch.storage.home");
         this._decktape = configuration.getString("gitpitch.decktape.home");
@@ -112,7 +116,8 @@ public class DiskService {
     public int download(PitchParams pp,
                         Path wd,
                         String source,
-                        String dest) {
+                        String dest,
+                        Map<String,String> headers) {
 
         int downloaded = 999;
 
@@ -126,20 +131,13 @@ public class DiskService {
 
             final long start = System.currentTimeMillis();
 
-            WSRequest downloadReq = ws.url(source);
+            final WSRequest downloadReq = ws.url(source);
 
-            if (GitHub.call(source)) {
+            downloadReq.setHeader(API_CACHE_CONTROL, API_NO_CACHE);
 
-                downloadReq =
-                        downloadReq.setHeader(API_CACHE_CONTROL, API_NO_CACHE);
-
-                if (rawAuthToken() != null) {
-                    String tokenValue = API_HEADER_TOKEN + rawAuthToken();
-                    downloadReq =
-                            downloadReq.setHeader(API_HEADER_AUTH, tokenValue);
-                }
-
-            }
+            headers.forEach((k,v) -> {
+                downloadReq.setHeader(k, v);
+            });                
 
             WSResponse downloadResp =
                     downloadReq.get().toCompletableFuture().get();

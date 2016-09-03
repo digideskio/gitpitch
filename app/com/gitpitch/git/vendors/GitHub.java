@@ -29,63 +29,18 @@ import com.gitpitch.services.DiskService;
 import com.gitpitch.utils.PitchParams;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.nio.file.Path;
+import java.util.*;
 import javax.inject.*;
 import play.Logger;
 import play.Logger.ALogger;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * GitHub API Service.
  */
 @Singleton
-public class GitHub implements GRSService {
+public class GitHub extends GRSService {
 
     private final Logger.ALogger log = Logger.of(this.getClass());
-
-    private final AtomicInteger cacheBypass = new AtomicInteger();
-    private GRSManager grsManager;
-    private DiskService diskService;
-
-    public void init(GRSManager grsManager,
-                     DiskService diskService) {
-        this.grsManager = grsManager;
-        this.diskService = diskService;
-    }
-
-    public boolean call(PitchParams pp, String apiPath) {
-
-        if(apiPath != null) {
-            GRS grs = grsManager.get(pp);
-            return apiPath.startsWith(grs.apiBase()) ||
-                    apiPath.startsWith(grs.rawBase());
-        } else {
-            return false;
-        }
-    }
-
-    public int download(PitchParams pp, String filename) {
-
-        int status = 999;
-
-        GRS grs = grsManager.get(pp);
-        GRSService grsService = grsManager.getService(grs);
-        Path branchPath = diskService.ensure(pp);
-        String gitHubLink = raw(pp, filename, true);
-        log.debug("download: gitHubLink={}", gitHubLink);
-
-        if (grsService.call(pp, gitHubLink)) {
-            status = diskService.download(pp,
-                                          branchPath,
-                                          gitHubLink,
-                                          filename,
-                                          grs.headers());
-        }
-
-        log.debug("download: returning status={}", status);
-        return status;
-    }
 
     public GitRepoModel model(PitchParams pp, JsonNode json) {
         return GitHubRepoModel.build(pp, json);
@@ -105,22 +60,6 @@ public class GitHub implements GRSService {
                 .toString();
     }
 
-    public String raw(PitchParams pp, String filename) {
-        return raw(pp, filename, false);
-    }
-
-    public String raw(PitchParams pp,
-                      String filename,
-                      boolean bypassCache) {
-
-        if (bypassCache) {
-            return raw(pp) + filename +
-                    "?gp=" + cacheBypass.getAndIncrement();
-        } else {
-            return raw(pp) + filename;
-        }
-    }
-
     public String repo(PitchParams pp) {
 
         GRS grs = grsManager.get(pp);
@@ -134,7 +73,5 @@ public class GitHub implements GRSService {
     }
 
     public static final String TYPE = "github";
-
-    private static final String SLASH = "/";
     private static final String GITHUB_REPO_API = "repos/";
 }

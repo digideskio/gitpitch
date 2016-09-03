@@ -29,63 +29,18 @@ import com.gitpitch.utils.PitchParams;
 import com.gitpitch.services.DiskService;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.nio.file.Path;
+import java.util.*;
 import javax.inject.*;
 import play.Logger;
 import play.Logger.ALogger;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * BitBucket API Service.
  */
 @Singleton
-public class BitBucket implements GRSService {
+public class BitBucket extends GRSService {
 
     private final Logger.ALogger log = Logger.of(this.getClass());
-
-    private final AtomicInteger cacheBypass = new AtomicInteger();
-    private GRSManager grsManager;
-    private DiskService diskService;
-
-    public void init(GRSManager grsManager,
-                     DiskService diskService) {
-        this.grsManager = grsManager;
-        this.diskService = diskService;
-    }
-
-    public boolean call(PitchParams pp, String apiPath) {
-
-        if(apiPath != null) {
-            GRS grs = grsManager.get(pp);
-            return apiPath.startsWith(grs.apiBase()) ||
-                    apiPath.startsWith(grs.rawBase());
-        } else {
-            return false;
-        }
-    }
-
-    public int download(PitchParams pp, String filename) {
-
-        int status = 999;
-
-        GRS grs = grsManager.get(pp);
-        GRSService grsService = grsManager.getService(grs);
-        Path branchPath = diskService.ensure(pp);
-        String bitbucketLink = raw(pp, filename, true);
-        log.debug("download: bitbucketLink={}", bitbucketLink);
-
-        if (grsService.call(pp, bitbucketLink)) {
-            status = diskService.download(pp,
-                                          branchPath,
-                                          bitbucketLink,
-                                          filename,
-                                          grs.headers());
-        }
-
-        log.debug("download: returning status={}", status);
-        return status;
-    }
 
     public GitRepoModel model(PitchParams pp, JsonNode json) {
         return BitBucketRepoModel.build(pp, json);
@@ -105,22 +60,6 @@ public class BitBucket implements GRSService {
                 .toString();
     }
 
-    public String raw(PitchParams pp, String filename) {
-        return raw(pp, filename, false);
-    }
-
-    public String raw(PitchParams pp,
-                      String filename,
-                      boolean bypassCache) {
-
-        if (bypassCache) {
-            return raw(pp) + filename +
-                    "?gp=" + cacheBypass.getAndIncrement();
-        } else {
-            return raw(pp) + filename;
-        }
-    }
-
     public String repo(PitchParams pp) {
 
         GRS grs = grsManager.get(pp);
@@ -134,8 +73,6 @@ public class BitBucket implements GRSService {
     }
 
     public static final String TYPE = "bitbucket";
-
-    private static final String SLASH = "/";
     private static final String BITBUCKET_REPO_API = "repositories/";
     private static final String BITBUCKET_RAW = "/raw/";
 }

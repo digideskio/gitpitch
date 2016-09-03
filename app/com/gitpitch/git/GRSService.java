@@ -23,49 +23,110 @@
  */
 package com.gitpitch.git;
 
+import com.gitpitch.git.*;
 import com.gitpitch.models.GitRepoModel;
 import com.gitpitch.utils.PitchParams;
+import com.gitpitch.services.DiskService;
+import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicInteger;
 import com.fasterxml.jackson.databind.JsonNode;
+import play.Logger;
+import play.Logger.ALogger;
 
 /*
  * Git Respository Service common interface.
  */
-public interface GRSService {
+public abstract class GRSService {
+
+    private final Logger.ALogger log = Logger.of(this.getClass());
+
+    protected final AtomicInteger cacheBypass = new AtomicInteger();
+    protected GRSManager grsManager;
+    protected DiskService diskService;
+
+    public void init(GRSManager grsManager,
+                     DiskService diskService) {
+        this.grsManager = grsManager;
+        this.diskService = diskService;
+    }
 
     /*
      * Return true if apiPath is a call on this GRSService instance.
      */
-    public boolean call(PitchParams pp, String apiPath);
+    public boolean call(PitchParams pp, String apiPath) {
+
+        if(apiPath != null) {
+            GRS grs = grsManager.get(pp);
+            return apiPath.startsWith(grs.apiBase()) ||
+                    apiPath.startsWith(grs.rawBase());
+        } else {
+            return false;
+        }
+    }
 
     /*
      * Return zero if file download completes successfully.
      */
-    public int download(PitchParams pp, String filename);
+    public int download(PitchParams pp, String filename) {
+
+        int status = 999;
+
+        GRS grs = grsManager.get(pp);
+        GRSService grsService = grsManager.getService(grs);
+        Path branchPath = diskService.ensure(pp);
+        String grsLink = raw(pp, filename, true);
+        log.debug("download: grsLink={}", grsLink);
+
+        if (grsService.call(pp, grsLink)) {
+            status = diskService.download(pp,
+                                          branchPath,
+                                          grsLink,
+                                          filename,
+                                          grs.headers());
+        }
+
+        log.debug("download: returning status={}", status);
+        return status;
+    }
 
     /*
      * Return model representing Git repository meta-data.
      */
-    public GitRepoModel model(PitchParams pp, JsonNode json);
+    public abstract GitRepoModel model(PitchParams pp, JsonNode json);
 
     /*
      * Return Raw API path for /user/repo/branch.
      */
-    public String raw(PitchParams pp);
+    public abstract String raw(PitchParams pp);
 
     /*
      * Return Raw API path for /user/repo/branch/filename.
      */
-    public String raw(PitchParams pp, String filename);
+    public String raw(PitchParams pp, String filename) {
+        return raw(pp, filename, false);
+    }
 
     /*
      * Return Raw API path for /user/repo/branch/filename with 
      * optional query param used to bypass GRS API caching.
      */
-    public String raw(PitchParams pp, String filename, boolean bypassCache);
+    public String raw(PitchParams pp,
+                      String filename,
+                      boolean bypassCache) {
+
+        if (bypassCache) {
+            return raw(pp) + filename +
+                    "?gp=" + cacheBypass.getAndIncrement();
+        } else {
+            return raw(pp) + filename;
+        }
+    }
 
     /*
      * Return API path for repository meta call for /user/repo.
      */
-    public String repo(PitchParams pp);
+    public abstract String repo(PitchParams pp);
+
+    protected static final String SLASH = "/";
 
 }

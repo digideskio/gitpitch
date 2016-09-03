@@ -29,63 +29,18 @@ import com.gitpitch.services.DiskService;
 import com.gitpitch.utils.PitchParams;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.nio.file.Path;
+import java.util.*;
 import javax.inject.*;
 import play.Logger;
 import play.Logger.ALogger;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * GitLab API Service.
  */
 @Singleton
-public class GitLab implements GRSService {
+public class GitLab extends GRSService {
 
     private final Logger.ALogger log = Logger.of(this.getClass());
-
-    private final AtomicInteger cacheBypass = new AtomicInteger();
-    private GRSManager grsManager;
-    private DiskService diskService;
-
-    public void init(GRSManager grsManager,
-                     DiskService diskService) {
-        this.grsManager = grsManager;
-        this.diskService = diskService;
-    }
-
-    public boolean call(PitchParams pp, String apiPath) {
-
-        if(apiPath != null) {
-            GRS grs = grsManager.get(pp);
-            return apiPath.startsWith(grs.apiBase()) ||
-                    apiPath.startsWith(grs.rawBase());
-        } else {
-            return false;
-        }
-    }
-
-    public int download(PitchParams pp, String filename) {
-
-        int status = 999;
-
-        GRS grs = grsManager.get(pp);
-        GRSService grsService = grsManager.getService(grs);
-        Path branchPath = diskService.ensure(pp);
-        String gitLabLink = raw(pp, filename, true);
-        log.debug("download: gitLabLink={}", gitLabLink);
-
-        if (grsService.call(pp, gitLabLink)) {
-            status = diskService.download(pp,
-                                          branchPath,
-                                          gitLabLink,
-                                          filename,
-                                          grs.headers());
-        }
-
-        log.debug("download: returning status={}", status);
-        return status;
-    }
 
     public GitRepoModel model(PitchParams pp, JsonNode json) {
         return GitLabRepoModel.build(pp, json);
@@ -103,22 +58,6 @@ public class GitLab implements GRSService {
                 .append(pp.branch)
                 .append(SLASH)
                 .toString();
-    }
-
-    public String raw(PitchParams pp, String filename) {
-        return raw(pp, filename, false);
-    }
-
-    public String raw(PitchParams pp,
-                      String filename,
-                      boolean bypassCache) {
-
-        if (bypassCache) {
-            return raw(pp) + filename +
-                    "?gp=" + cacheBypass.getAndIncrement();
-        } else {
-            return raw(pp) + filename;
-        }
     }
 
     public String repo(PitchParams pp) {
@@ -144,9 +83,6 @@ public class GitLab implements GRSService {
     }
 
     public static final String TYPE = "gitlab";
-
-    private static final String SLASH = "/";
     private static final String GITLAB_PROJECTS_API = "projects/";
     private static final String GITLAB_RAW = "/raw/";
-
 }

@@ -153,7 +153,6 @@ public class GitService {
 
                                     JsonNode json = apiResp.asJson();
                                     GitRepoModel grm = grsService.model(pp, json);
-                                    //GitRepoModel grm = new GitRepoModel(pp, json);
 
                                     /*
                                      * Update pitchCache with new GitRepoModel
@@ -163,10 +162,10 @@ public class GitService {
                                     pitchCache.set(grm.key(), grm, cacheTimeout.grm(pp));
 
                                 } catch (Exception ex) {
-                            /*
-                             * Prevent any runtime errors, such as JSON parsing,
-                             * from propogating to the front end.
-                             */
+                                    /*
+                                     * Prevent any runtime errors, such as JSON parsing,
+                                     * from propogating to the front end.
+                                     */
                                     log.warn("fetchRepo: pp={}, unexpected ex={}", pp, ex);
                                 }
 
@@ -194,16 +193,16 @@ public class GitService {
                             log.warn("fetchRepo: pp={}, unexpected runtime ex={}", pp, rex);
                         }
 
-                /*
-                 * Current operation completed, so remove latch associated
-                 * with operation from repoLatchMap to permit future operations
-                 * on this /{user}/{repo}.
-                 */
+                        /*
+                         * Current operation completed, so remove latch associated
+                         * with operation from repoLatchMap to permit future operations
+                         * on this /{user}/{repo}.
+                         */
                         releaseCountDownLatch(repoLatchMap, grmKey);
 
-                /*
-                 * Operation completed, valid result cached, no return required.
-                 */
+                        /*
+                         * Operation completed, valid result cached, no return required.
+                         */
                         return null;
 
                     }, backEndThreads.POOL)
@@ -248,42 +247,29 @@ public class GitService {
             CompletableFuture<Void> syncFuture =
                     CompletableFuture.supplyAsync(() -> {
 
-
                         GRS grs = grsManager.get(pp);
                         GRSService grsService = grsManager.getService(grs);
-
-/*
-
-                        Path branchPath = diskService.ensure(pp);
-
-                        String yamlLink = grsService.raw(pp, PITCHME_YAML, true);
-                        log.debug("fetchYAML: rawurl={}", yamlLink);
-                        int downYAML =
-                                diskService.download(pp, branchPath, yamlLink, PITCHME_YAML);
-                        boolean downOk = downYAML == STATUS_OK;
-                        log.debug("fetchYAML: pp={}, downloaded YAML={}", pp, downYAML);
-*/
                         int downYAML = grsService.download(pp, PITCHME_YAML);
                         boolean downOk = downYAML == STATUS_OK;
                         log.debug("fetchYAML: pp={}, downloaded YAML={}", pp, downYAML);
 
-                /*
-                 * Update pitchCache with new SlideshowModel.
-                 */
+                        /*
+                         * Update pitchCache with new SlideshowModel.
+                         */
                         SlideshowModel ssm =
                                 SlideshowModel.build(pp, downOk, grsService, diskService);
                         pitchCache.set(ssm.key(), ssm, cacheTimeout.ssm(pp));
 
-                /*
-                 * Current operation completed, so remove latch associated
-                 * with operation from yamlLatchMap to permit future
-                 * operations on this /{user}/{repo}?b={branch}.
-                 */
+                        /*
+                         * Current operation completed, so remove latch associated
+                         * with operation from yamlLatchMap to permit future
+                         * operations on this /{user}/{repo}?b={branch}.
+                         */
                         releaseCountDownLatch(yamlLatchMap, ssmKey);
 
-                /*
-                 * Operation completed, valid result cached, no return required.
-                 */
+                        /*
+                         * Operation completed, valid result cached, no return required.
+                         */
                         return null;
 
                     }, backEndThreads.POOL)
@@ -332,12 +318,6 @@ public class GitService {
                         GRS grs = grsManager.get(pp);
                         GRSService grsService = grsManager.getService(grs);
 
-/*
-                        Path branchPath = diskService.ensure(pp);
-                        String mdLink = grsService.raw(pp, PITCHME_MD, true);
-                        int downStatus =
-                                diskService.download(pp, branchPath, mdLink, PITCHME_MD);
-*/
                         int downStatus = grsService.download(pp, PITCHME_MD);
 
                         if (downStatus == STATUS_OK) {
@@ -358,16 +338,16 @@ public class GitService {
                                     pp, downStatus);
                         }
 
-                /*
-                 * Current operation completed, so remove latch associated
-                 * with operation from markdownLatchMap to permit future
-                 * operations on this /{user}/{repo}?b={branch}.
-                 */
+                        /*
+                         * Current operation completed, so remove latch associated
+                         * with operation from markdownLatchMap to permit future
+                         * operations on this /{user}/{repo}?b={branch}.
+                         */
                         releaseCountDownLatch(markdownLatchMap, mdmKey);
 
-                /*
-                 * Operation completed, valid result cached, no return required.
-                 */
+                        /*
+                         * Operation completed, valid result cached, no return required.
+                         */
                         return null;
 
                     }, backEndThreads.POOL)
@@ -405,12 +385,6 @@ public class GitService {
         }
 
     }
-
-/*
-    public String githubApiToken() {
-        return configuration.getString("gitpitch.github.api.token");
-    }
-*/
 
     private static final String GHUB_REPO_META =
             "https://api.github.com/repos/";

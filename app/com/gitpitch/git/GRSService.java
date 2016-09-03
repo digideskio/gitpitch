@@ -57,8 +57,8 @@ public abstract class GRSService {
 
         if(apiPath != null) {
             GRS grs = grsManager.get(pp);
-            return apiPath.startsWith(grs.apiBase()) ||
-                    apiPath.startsWith(grs.rawBase());
+            return apiPath.startsWith(grs.getApiBase()) ||
+                    apiPath.startsWith(grs.getRawBase());
         } else {
             return false;
         }
@@ -82,7 +82,7 @@ public abstract class GRSService {
                                           branchPath,
                                           grsLink,
                                           filename,
-                                          grs.headers());
+                                          grs.getHeaders());
         }
 
         log.debug("download: returning status={}", status);

@@ -23,6 +23,8 @@
  */
 package com.gitpitch.controllers;
 
+import com.gitpitch.git.GRS;
+import com.gitpitch.git.GRSManager;
 import com.gitpitch.models.GitRepoModel;
 import com.gitpitch.models.MarkdownModel;
 import com.gitpitch.executors.FrontEndThreads;
@@ -56,6 +58,7 @@ public class PitchController extends Controller {
     private final PitchService pitchService;
     private final FrontEndThreads frontEndThreads;
     private final Dependencies deps;
+    private final GRSManager grsManager;
     private final Configuration cfg;
     private final WSClient ws;
     private final Environment env;
@@ -65,6 +68,7 @@ public class PitchController extends Controller {
     public PitchController(PitchService pitchService,
                            FrontEndThreads frontEndThreads,
                            Dependencies deps,
+                           GRSManager grsManager,
                            Configuration cfg,
                            WSClient ws,
                            Environment env) {
@@ -72,6 +76,7 @@ public class PitchController extends Controller {
         this.pitchService = pitchService;
         this.frontEndThreads = frontEndThreads;
         this.deps = deps;
+        this.grsManager = grsManager;
         this.cfg = cfg;
         this.ws = ws;
         this.env = env;
@@ -135,7 +140,8 @@ public class PitchController extends Controller {
                 log.info("landing:   [ cached, online ] {}", pp);
 
             GitRepoModel grm = grmo.get();
-            GitRepoRenderer rndr = GitRepoRenderer.build(pp, grm, cfg);
+            GitRepoRenderer rndr =
+                GitRepoRenderer.build(pp, grm, cfg, grsManager.listGRS());
 
             return CompletableFuture.completedFuture(
                     ok(com.gitpitch.views.html.Landing.render(rndr,
@@ -150,7 +156,9 @@ public class PitchController extends Controller {
             }, frontEndThreads.POOL)
                     .thenApply(fetched -> {
 
-                        GitRepoRenderer rndr = GitRepoRenderer.build(pp, fetched, cfg);
+                        GitRepoRenderer rndr =
+                            GitRepoRenderer.build(pp, fetched, cfg,
+                                    grsManager.listGRS());
 
                         if (rndr.isValid()) {
                             if (isOffline)
@@ -163,6 +171,9 @@ public class PitchController extends Controller {
                             else
                                 log.info("landing:   [ notfnd, online ] {}", pp);
                         }
+
+
+                        log.debug("landing: rndr.services={}", rndr.listGRS());
 
                         return ok(com.gitpitch.views.html.Landing.render(rndr,
                                 deps, isOffline, gaToken));

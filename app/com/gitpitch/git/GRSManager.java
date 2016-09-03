@@ -27,6 +27,7 @@ import com.gitpitch.git.vendors.*;
 import com.gitpitch.services.DiskService;
 import com.gitpitch.utils.PitchParams;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.*;
 import play.Configuration;
 import play.Logger;
@@ -81,7 +82,7 @@ public class GRSManager {
 
             if(grs != null) {
 
-                grsStore.put(grs.type(), grs);
+                grsStore.put(grs.getType(), grs);
                 if(grs.isDefault())
                     grsDefault = grs;
 
@@ -91,10 +92,10 @@ public class GRSManager {
         }
 
         if(grsStore.isEmpty()) {
-            grsStore.put(fallback.type(), fallback);
+            grsStore.put(fallback.getType(), fallback);
             grsDefault = fallback;
             log.info("fallback: {}, type={}, true",
-                    grsDefault.id(), grsDefault.type());
+                    grsDefault.getName(), grsDefault.getType());
         }
 
         if(grsDefault == null) {
@@ -103,7 +104,7 @@ public class GRSManager {
 
         grsStore.forEach((k,v) -> {
             log.info("activating: {}, type={}, default={}",
-                    k, v.type(), v.isDefault());
+                    v.getName(), k, v.isDefault());
         });
     }
 
@@ -116,7 +117,7 @@ public class GRSManager {
 
         GRSService service;
 
-        switch(grs.type()) {
+        switch(grs.getType()) {
 
             case GitHub.TYPE:
                 log.debug("getService: matching GitHub");
@@ -139,9 +140,18 @@ public class GRSManager {
         return service;
     }
 
+    public List<GRS> listGRS() {
+        List<GRS> services = grsStore.entrySet()
+                       .stream()
+                       .map(Map.Entry::getValue)
+                       .collect(Collectors.toList());
+        log.debug("listGRS: {}", services);
+        return services;
+    }
+
     static Map<String,String> GRS_FALLBACK = new HashMap<String, String>();
     static {
-        GRS_FALLBACK.put("id", "GitHub");
+        GRS_FALLBACK.put("name", "GitHub");
         GRS_FALLBACK.put("type", "github");
         GRS_FALLBACK.put("apibase", "https://api.github.com/");
         GRS_FALLBACK.put("apitoken", null);

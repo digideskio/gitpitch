@@ -127,9 +127,9 @@ public class GitService {
 
             WSRequest apiRequest = wsClient.url(apiCall);
 
-            if (grs.apiToken() != null && grs.apiTokenHeader() != null) {
-                apiRequest = apiRequest.setHeader(grs.apiTokenHeader(),
-                                                        grs.apiToken());
+            if (grs.getApiToken() != null && grs.getApiTokenHeader() != null) {
+                apiRequest = apiRequest.setHeader(grs.getApiTokenHeader(),
+                                                        grs.getApiToken());
             }
 
             CompletableFuture<WSResponse> apiFuture =

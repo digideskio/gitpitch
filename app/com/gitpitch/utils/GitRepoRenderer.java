@@ -23,6 +23,7 @@
  */
 package com.gitpitch.utils;
 
+import com.gitpitch.git.GRS;
 import com.gitpitch.models.GitRepoModel;
 import com.gitpitch.utils.PitchParams;
 import play.Configuration;
@@ -42,6 +43,7 @@ public class GitRepoRenderer {
     private final PitchParams _pp;
     private final GitRepoModel _grm;
     private Configuration _cfg;
+    private List<GRS> _grsServices;
     /*
      * Relative URLs for view components.
      */
@@ -57,17 +59,19 @@ public class GitRepoRenderer {
     private String _starHub;
     private String _forkHub;
 
-    private GitRepoRenderer(PitchParams pp) {
-        this(pp, null, null);
+    private GitRepoRenderer(PitchParams pp, List<GRS> grsServices) {
+        this(pp, null, null, grsServices);
     }
 
     private GitRepoRenderer(PitchParams pp,
                             GitRepoModel grm,
-                            Configuration cfg) {
+                            Configuration cfg,
+                            List<GRS> grsServices) {
 
         this._pp = pp;
         this._grm = grm;
         this._cfg = cfg;
+        this._grsServices = grsServices;
 
         if (grm != null) {
 
@@ -133,9 +137,10 @@ public class GitRepoRenderer {
 
     public static GitRepoRenderer build(PitchParams pp,
                                         GitRepoModel grm,
-                                        Configuration cfg) {
+                                        Configuration cfg,
+                                        List<GRS> grsServices) {
 
-        return new GitRepoRenderer(pp, grm, cfg);
+        return new GitRepoRenderer(pp, grm, cfg, grsServices);
     }
 
     /*
@@ -375,6 +380,20 @@ public class GitRepoRenderer {
                 .append(pageLink(true))
                 .append(BADGE_CLOSE)
                 .toString();
+    }
+
+    public String getGRS(PitchParams pp) {
+        String grsName = "GitHub";
+        for(GRS grs : _grsServices) {
+            if(grs.getType().equals(pp.grs)) {
+                grsName = grs.getName();
+            }
+        }
+        return grsName;
+    }
+
+    public List<GRS> listGRS() {
+        return _grsServices;
     }
 
     /*

@@ -72,7 +72,7 @@ public class DiskService {
      * Return PitchParams branch working directory.
      */
     public Path bwd(PitchParams pp) {
-        return Paths.get(storage(), pp.user, pp.repo, pp.branch);
+        return Paths.get(storage(), pp.grs, pp.user, pp.repo, pp.branch);
     }
 
     /*
@@ -80,7 +80,7 @@ public class DiskService {
      */
     public Path asPath(PitchParams pp,
                        String filename) {
-        return Paths.get(storage(), pp.user, pp.repo, pp.branch, filename);
+        return Paths.get(storage(), pp.grs, pp.user, pp.repo, pp.branch, filename);
     }
 
     /*

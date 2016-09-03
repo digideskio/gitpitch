@@ -244,7 +244,7 @@ public class OfflineService {
                 diskService.ensure(diskService.asPath(pp, ZIP_MD_DIR));
         return diskService.download(pp,
                 zipMdPath, murl, PITCHME_ONLINE_MD,
-                grsManager.get(pp).headers());
+                grsManager.get(pp).getHeaders());
     }
 
     /*
@@ -263,7 +263,7 @@ public class OfflineService {
                         .absoluteURL(isEncrypted(), hostname());
 
         return diskService.download(pp, zipRoot,
-                lurl, INDEX_HTML, grsManager.get(pp).headers());
+                lurl, INDEX_HTML, grsManager.get(pp).getHeaders());
     }
 
     /*
@@ -283,7 +283,7 @@ public class OfflineService {
                         .absoluteURL(isEncrypted(), hostname());
 
         return diskService.download(pp, zipRoot,
-                surl, SLIDESHOW_HTML, grsManager.get(pp).headers());
+                surl, SLIDESHOW_HTML, grsManager.get(pp).getHeaders());
     }
 
     /*
@@ -400,7 +400,7 @@ public class OfflineService {
                             !fetched.contains(assetUrl)) {
                         diskService.download(pp, zipMdAssetsPath, assetUrl,
                             FilenameUtils.getName(assetUrl),
-                            grsManager.get(pp).headers());
+                            grsManager.get(pp).getHeaders());
                         fetched.add(assetUrl);
                     }
                 }
@@ -434,7 +434,7 @@ public class OfflineService {
                         diskService.ensure(diskService.asPath(pp,
                                 ZIP_ASSETS_DIR));
                 diskService.download(pp, zipAssetsPath,
-                        logoUrl, logoName, grsManager.get(pp).headers());
+                        logoUrl, logoName, grsManager.get(pp).getHeaders());
                 log.debug("fetchYAMLDependencies: downloaded logo={}", logoUrl);
             }
 

@@ -32,7 +32,7 @@ import java.util.HashMap;
  */
 public class GRS {
 
-    private final String id;
+    private final String name;
     private final String type;
     private final String apiBase;
     private final String apiToken;
@@ -40,7 +40,7 @@ public class GRS {
     private final String rawBase;
     private final boolean isDefault;
 
-    private GRS(String id,
+    private GRS(String name,
                 String type,
                 String apiBase,
                 String apiToken,
@@ -48,7 +48,7 @@ public class GRS {
                 String rawBase,
                 boolean isDefault) {
 
-        this.id = id;
+        this.name = name;
         this.type = type;
         this.apiBase = apiBase;
         this.apiToken = apiToken;
@@ -59,7 +59,7 @@ public class GRS {
 
     public static GRS build(Map<String,String> grsCfg) {
 
-        String id = grsCfg.get("id");
+        String name = grsCfg.get("name");
         String type = grsCfg.get("type");
         String apiBase = grsCfg.get("apibase");
         String apiToken = grsCfg.get("apitoken");
@@ -67,32 +67,32 @@ public class GRS {
         String rawBase = grsCfg.get("rawbase");
         boolean isDefault = Boolean.parseBoolean(grsCfg.get("default"));
 
-        if(id != null && type != null && apiBase != null && rawBase != null) {
-            return new GRS(id, type, apiBase, apiToken,
+        if(name != null && type != null && apiBase != null && rawBase != null) {
+            return new GRS(name, type, apiBase, apiToken,
                     apiTokenHeader, rawBase, isDefault);
         } else {
             return null;
         }
     }
 
-    public String id() { return id; }
-    public String type() { return type; }
-    public String apiBase() { return apiBase; }
-    public String apiToken() { return apiToken; }
-    public String apiTokenHeader() { return apiTokenHeader; }
-    public String rawBase() { return rawBase; }
+    public String getName() { return name; }
+    public String getType() { return type; }
+    public String getApiBase() { return apiBase; }
+    public String getApiToken() { return apiToken; }
+    public String getApiTokenHeader() { return apiTokenHeader; }
+    public String getRawBase() { return rawBase; }
     public boolean isDefault() { return isDefault; }
 
-    public Map<String,String> headers() {
+    public Map<String,String> getHeaders() {
         Map<String,String> hdrs = new HashMap<String,String>();
-        if(apiToken() != null && apiTokenHeader() != null) {
-            hdrs.put(apiTokenHeader, apiToken);
+        if(getApiToken() != null && getApiTokenHeader() != null) {
+            hdrs.put(getApiTokenHeader(), getApiToken());
         }
         return hdrs;
     }
 
     public String toString() {
-        return "GRS[ " + id + " ][ " + type + " ]";
+        return "GRS[ " + name + " ][ " + type + " ]";
     }
 
 }

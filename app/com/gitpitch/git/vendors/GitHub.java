@@ -50,7 +50,7 @@ public class GitHub extends GRSService {
 
         GRS grs = grsManager.get(pp);
 
-        return new StringBuffer(grs.rawBase())
+        return new StringBuffer(grs.getRawBase())
                 .append(pp.user)
                 .append(SLASH)
                 .append(pp.repo)
@@ -64,7 +64,7 @@ public class GitHub extends GRSService {
 
         GRS grs = grsManager.get(pp);
 
-        return new StringBuffer(grs.apiBase())
+        return new StringBuffer(grs.getApiBase())
                 .append(GITHUB_REPO_API)
                 .append(pp.user)
                 .append(SLASH)

@@ -66,20 +66,22 @@ public class GitLabRepoModel extends GitRepoModel {
          */
         if (json != null) {
 
-            JsonNode ownerNode = json.findPath("owner");
-            this._type = ownerNode.findPath("type").textValue();
-
+            this._type = USER_TYPE;
             this._desc = json.findPath("description").textValue();
-            this._created = json.findPath("created_at").textValue();
-            this._updated = json.findPath("updated_at").textValue();
-            this._lang = json.findPath("language").textValue();
+            this._lang = null;
 
-            this._stars = json.findPath("stargazers_count").asInt();
+            JsonNode namespaceNode = json.findPath("namespace");
+            if(namespaceNode != null) {
+                this._created = namespaceNode.findPath("created_at").textValue();
+                this._updated = namespaceNode.findPath("updated_at").textValue();
+            }
+
+            this._stars = json.findPath("star_count").asInt();
             this._forks = json.findPath("forks_count").asInt();
-            this._issues = json.findPath("open_issues").asInt();
+            this._issues = json.findPath("open_issues_count").asInt();
 
-            this._hasWiki = json.findPath("has_wiki").asBoolean();
-            this._hasPages = json.findPath("has_pages").asBoolean();
+            this._hasWiki = json.findPath("wiki_enabled").asBoolean();
+            this._hasPages = false;
 
         } else {
 
@@ -143,4 +145,6 @@ public class GitLabRepoModel extends GitRepoModel {
     public String key() {
         return _cacheKey;
     }
+
+    private static final String USER_TYPE = "User";
 }

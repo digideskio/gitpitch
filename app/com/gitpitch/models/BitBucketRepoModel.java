@@ -70,16 +70,16 @@ public class BitBucketRepoModel extends GitRepoModel {
             this._type = ownerNode.findPath("type").textValue();
 
             this._desc = json.findPath("description").textValue();
-            this._created = json.findPath("created_at").textValue();
-            this._updated = json.findPath("updated_at").textValue();
+            this._created = json.findPath("created_on").textValue();
+            this._updated = json.findPath("updated_on").textValue();
             this._lang = json.findPath("language").textValue();
 
-            this._stars = json.findPath("stargazers_count").asInt();
-            this._forks = json.findPath("forks_count").asInt();
-            this._issues = json.findPath("open_issues").asInt();
+            this._stars = 0;
+            this._forks = 0;
+            this._issues = 0;
 
             this._hasWiki = json.findPath("has_wiki").asBoolean();
-            this._hasPages = json.findPath("has_pages").asBoolean();
+            this._hasPages = false;
 
         } else {
 

@@ -24,6 +24,7 @@
 package com.gitpitch.utils;
 
 import com.gitpitch.git.GRS;
+import com.gitpitch.git.vendors.*;
 import com.gitpitch.models.GitRepoModel;
 import com.gitpitch.utils.PitchParams;
 import play.Configuration;
@@ -102,7 +103,20 @@ public class GitRepoRenderer {
                             _grm.name(),
                             _pp.branch).toString();
 
-            this._orgHub = new StringBuffer(GIT_COM).append(_grm.owner())
+            String grsDotCom = GRS_GITHUB_COM;
+            switch(_pp.grs) {
+                case GitHub.TYPE:
+                    grsDotCom = GRS_GITHUB_COM;
+                    break;
+                case GitLab.TYPE:
+                    grsDotCom = GRS_GITLAB_COM;
+                    break;
+                case BitBucket.TYPE:
+                    grsDotCom = GRS_BITBUCKET_COM;
+                    break;
+            }
+
+            this._orgHub = new StringBuffer(grsDotCom).append(_grm.owner())
                     .toString();
 
             this._repoHub =
@@ -111,13 +125,45 @@ public class GitRepoRenderer {
                             .toString();
 
 
-            this._starHub = new StringBuffer(this._repoHub).append(SLASH)
-                    .append(STARGAZERS)
-                    .toString();
+            switch(_pp.grs) {
 
-            this._forkHub = new StringBuffer(this._repoHub).append(SLASH)
-                    .append(FORKS)
-                    .toString();
+                case GitHub.TYPE:
+                    this._starHub =
+                        new StringBuffer(this._repoHub).append(SLASH)
+                                                       .append(GRS_GITHUB_STARS)
+                                                       .toString();
+                    this._forkHub =
+                        new StringBuffer(this._repoHub).append(SLASH)
+                                                       .append(GRS_GITHUB_FORKS)
+                                                       .toString();
+                    break;
+                case GitLab.TYPE:
+                    this._starHub =
+                        new StringBuffer(this._repoHub).append(SLASH)
+                                                       .append(GRS_GITLAB_STARS)
+                                                       .toString();
+                    this._forkHub =
+                        new StringBuffer(this._repoHub).append(SLASH)
+                                                       .append(GRS_GITLAB_FORKS)
+                                                       .append(_pp.branch)
+                                                       .toString();
+                    break;
+                case BitBucket.TYPE:
+                    this._starHub =
+                        new StringBuffer(this._repoHub).append(SLASH)
+                                                       .append(GRS_BITBUCKET_STARS)
+                                                       .toString();
+                    this._forkHub =
+                        new StringBuffer(this._repoHub).append(SLASH)
+                                                       .append(GRS_BITBUCKET_FORKS)
+                                                       .toString();
+                    break;
+
+                default:
+                    this._starHub = "#";
+                    this._forkHub = "#";
+                    break;
+            }
         } else {
 
             /*
@@ -278,7 +324,15 @@ public class GitRepoRenderer {
      * Return GitHub repository language.
      */
     public String repoLang() {
-        return (_grm != null) ? _grm.lang() : null;
+
+        String repoLang = null;
+
+        if(_grm != null) {
+            if(_grm.lang() != null && _grm.lang().length() > 0) {
+                repoLang = _grm.lang();
+            }
+        }
+        return repoLang;
     }
 
     /*
@@ -383,7 +437,7 @@ public class GitRepoRenderer {
     }
 
     public String getGRS(PitchParams pp) {
-        String grsName = "GitHub";
+        String grsName = null;
         for(GRS grs : _grsServices) {
             if(grs.getType().equals(pp.grs)) {
                 grsName = grs.getName();
@@ -418,9 +472,6 @@ public class GitRepoRenderer {
     private static final String SLASH = "/";
     private static final String QMARK_BRANCH = "?b=";
     private static final String QMARK_THEME = "&t=";
-    private static final String GIT_COM = "https://github.com/";
-    private static final String STARGAZERS = "stargazers";
-    private static final String FORKS = "network";
     private static final String HTTP_HASH = "#";
     private static final String EMBED_OPEN =
             "<iframe width='770' height='515' src='";
@@ -432,4 +483,15 @@ public class GitRepoRenderer {
     private static final String DEFAULT_THEME = "white";
     private static final List<String> THEMES = Arrays.asList(DEFAULT_THEME,
             "beige", "black", "moon", "night", "sky", "white");
+
+    private static final String GRS_GITHUB_COM = "https://github.com/";
+    private static final String GRS_GITLAB_COM = "https://gitlab.com/";
+    private static final String GRS_BITBUCKET_COM = "https://bitbucket.com/";
+
+    private static final String GRS_GITHUB_STARS = "stargazers";
+    private static final String GRS_GITHUB_FORKS = "network";
+    private static final String GRS_GITLAB_STARS = "activity";
+    private static final String GRS_GITLAB_FORKS = "graphs/";
+    private static final String GRS_BITBUCKET_STARS = "commits/all";
+    private static final String GRS_BITBUCKET_FORKS = "branches";
 }

@@ -141,7 +141,8 @@ public class GitService {
                         log.debug("fetchRepo: pp={}, fetch meta time-taken={}",
                                 pp, (System.currentTimeMillis() - start));
 
-                        log.info("GitHub: API Rate Limit Status [ {}, {} ]",
+                        log.info("{}: API Rate Limit Status [ {}, {} ]",
+                                grs.getName(),
                                 apiResp.getHeader(API_RATE_LIMIT),
                                 apiResp.getHeader(API_RATE_LIMIT_REMAINING));
 
@@ -182,7 +183,7 @@ public class GitService {
                                             Integer.parseInt(remainingHdr);
 
                                     if (rateLimitRemaining <= 0) {
-                                        log.warn("WARNING! GitHub API rate limit exceeded.");
+                                        log.warn("WARNING! {} API rate limit exceeded.", grs.getName());
                                     }
 
                                 } catch (Exception rlex) {

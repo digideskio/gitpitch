@@ -54,8 +54,13 @@
                             class="octicon octicon-star"></span> Star @rndr.stargazers()</a></li>
                     <li class="visible-lg visible-md" style="font-size:1.1em; color:white"><a href="@rndr.forkHub()"><span
                             class="octicon octicon-repo-forked"></span> Fork @rndr.forks()</a></li>
-                    <li style="font-size:1.2em; color:white"><a href="@rndr.repoHub()"><span
-                            class="mega-octicon octicon-mark-github" style="font-size:1.3em"></span></a></li>
+                    <li style="font-size:1.2em; color:white"><a href="@rndr.repoHub()">
+                    @if(rndr.params().grs.equals("github")) {
+                    <span class="mega-octicon octicon-mark-github" style="font-size:1.3em"></span>
+                    } else {
+                    <span class="fa fa-@rndr.params().grs" aria-hidden="true" style="font-size:1.4em"></span>
+                    }
+                    </a></li>
                     }
                 </ul>
             </div><!--/.nav-collapse -->

@@ -65,9 +65,7 @@ public class PitchParams {
                         String theme,
                         String notes) {
 
-        // TODO:DMR THIS NEEDS TO BE VALIDATED, NEVER NULL, DEFAULTS TO 
-        // DEFAULT VALUE SPECIFIED IN APPLICATION.CONF.
-        this.grs = (grs != null) ? grs : "github";
+        this.grs = grs;
 
         this.user = user;
         this.repo = repo;

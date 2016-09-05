@@ -127,7 +127,8 @@ public class PitchController extends Controller {
                                            String notes,
                                            String offline) {
 
-        PitchParams pp = PitchParams.build(grs, user, repo, branch, theme, notes);
+        PitchParams pp =
+            PitchParams.build(grsOnCall(grs), user, repo, branch, theme, notes);
         boolean isOffline =
                 (offline == null) ? false : Boolean.parseBoolean(offline);
         Optional<GitRepoModel> grmo = pitchService.cachedRepo(pp);
@@ -194,7 +195,8 @@ public class PitchController extends Controller {
                                              String fragments,
                                              String offline) {
 
-        PitchParams pp = PitchParams.build(grs, user, repo, branch, theme, notes);
+        PitchParams pp =
+            PitchParams.build(grsOnCall(grs), user, repo, branch, theme, notes);
         boolean printing =
                 (fragments == null) ? false : !Boolean.parseBoolean(fragments);
         boolean isOffline =
@@ -252,7 +254,8 @@ public class PitchController extends Controller {
                                             String repo,
                                             String branch) {
 
-        PitchParams pp = PitchParams.build(grs, user, repo, branch);
+        PitchParams pp =
+            PitchParams.build(grsOnCall(grs), user, repo, branch);
         Optional<MarkdownModel> mdmo = pitchService.cachedMarkdown(pp);
 
         if (mdmo.isPresent()) {
@@ -297,7 +300,8 @@ public class PitchController extends Controller {
                                          String theme,
                                          String notes) {
 
-        PitchParams pp = PitchParams.build(grs, user, repo, branch, theme, notes);
+        PitchParams pp =
+            PitchParams.build(grsOnCall(grs), user, repo, branch, theme, notes);
         Optional<File> pdfo = pitchService.cachedPDF(pp);
 
         if (pdfo.isPresent()) {
@@ -339,7 +343,8 @@ public class PitchController extends Controller {
                                            String notes) {
                                           
 
-        PitchParams pp = PitchParams.build(grs, user, repo, branch, theme, notes);
+        PitchParams pp =
+            PitchParams.build(grsOnCall(grs), user, repo, branch, theme, notes);
         log.debug("print: pp={}", pp);
 
         Optional<File> zipo = pitchService.cachedZip(pp);
@@ -379,6 +384,13 @@ public class PitchController extends Controller {
     public Result gist(String gid) {
         return ok(com.gitpitch.views.html.Gist.render(gid, deps));
     } // gist action
+
+    /*
+     * Determine GRS on call, explicitly defined or default.
+     */
+    private String grsOnCall(String grsParam) {
+        return grsManager.getType(grsParam);
+    }
 
     private static final String PITCHME_PRINT_ERROR =
             "GitPitch Slideshow print service temporarily unavailable.";

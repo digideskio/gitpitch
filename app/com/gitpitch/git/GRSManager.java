@@ -109,8 +109,17 @@ public class GRSManager {
     }
 
     public GRS get(PitchParams pp) {
-        GRS grs = grsStore.get(pp.grs);
+        return get(pp.grs);
+    }
+
+    public GRS get(String grsType) {
+        GRS grs = grsStore.get(grsType);
         return (grs != null) ? grs : grsDefault;
+    }
+
+    public String getType(String grsType) {
+        GRS grs = grsStore.get(grsType);
+        return (grs != null) ? grs.getType() : grsDefault.getType();
     }
 
     public GRSService getService(GRS grs) {

@@ -37,7 +37,7 @@ Create GitPitch slideshow content using GitHub flavored Markdown in your favorit
 
 ![TERMINAL](https://d1z75bzl1vljy2.cloudfront.net/hello-world/terminal.png)
 
-Git-commit on any branch and push your PITCHME.md to GitHub - GitLab - Bitbucket.
+Git-commit on any branch and push your PITCHME.md to GitHub, GitLab or Bitbucket.
 
 #HSLIDE
 

@@ -347,7 +347,7 @@ public class PitchController extends Controller {
 
         PitchParams pp =
             PitchParams.build(grsOnCall(grs), user, repo, branch, theme, notes);
-        log.debug("print: pp={}", pp);
+        log.debug("offline: pp={}", pp);
 
         Optional<File> zipo = pitchService.cachedZip(pp);
 
@@ -377,7 +377,7 @@ public class PitchController extends Controller {
                     });
         }
 
-    } // print action
+    } // offline action
 
     /*
      * Gist generates and renders GitHub-Gist HTML for

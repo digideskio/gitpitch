@@ -253,10 +253,10 @@ public class OfflineService {
     private int fetchLandingHTML(PitchParams pp, Path zipRoot) {
 
         String lurl =
-                com.gitpitch.controllers.routes.PitchController.landing(pp.grs,
-                        pp.user,
+                com.gitpitch.controllers.routes.PitchController.landing(pp.user,
                         pp.repo,
                         pp.branch,
+                        pp.grs,
                         pp.theme,
                         pp.notes,
                         ENABLED)

@@ -5,9 +5,9 @@
 
 #### Get the word out
 <br>
-<span style="color:gray">GitHub - GitLab - Bitbucket</span>
-<br>
 <span style="color:gray">Slideshow Presentations For Developers</span>
+<br>
+<span style="color:gray">GitHub - GitLab - Bitbucket</span>
 
 #HSLIDE
 

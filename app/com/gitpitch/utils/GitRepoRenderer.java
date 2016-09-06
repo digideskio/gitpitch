@@ -28,11 +28,12 @@ import com.gitpitch.git.vendors.*;
 import com.gitpitch.models.GitRepoModel;
 import com.gitpitch.utils.PitchParams;
 import play.Configuration;
-import play.Logger;
-import play.Logger.ALogger;
-
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
+import play.Logger;
+import play.Logger.ALogger;
 
 /*
  * Rendering model for views.Landing.scala.html.
@@ -103,27 +104,34 @@ public class GitRepoRenderer {
                             _grm.name(),
                             _pp.branch).toString();
 
-            String grsDotCom = GRS_GITHUB_COM;
-            switch(_pp.grs) {
-                case GitHub.TYPE:
-                    grsDotCom = GRS_GITHUB_COM;
-                    break;
-                case GitLab.TYPE:
-                    grsDotCom = GRS_GITLAB_COM;
-                    break;
-                case BitBucket.TYPE:
-                    grsDotCom = GRS_BITBUCKET_COM;
-                    break;
+            Optional<GRS> grso =
+                    this._grsServices.stream()
+                                     .filter(grs -> grs.getType().equals(_pp.grs))
+                                     .findFirst();
+
+            Optional<GRS> grsoDefault =
+                    this._grsServices.stream()
+                                     .filter(grs -> grs.isDefault())
+                                     .findFirst();
+
+            String grsSite = null;
+
+            if(grso.isPresent()) {
+                grsSite = grso.get().getSite();
+            } else {
+                if(grsoDefault.isPresent())
+                    grsSite = grsoDefault.get().getSite();
+                else
+                    grsSite = GRS_GITHUB_COM;
             }
 
-            this._orgHub = new StringBuffer(grsDotCom).append(_grm.owner())
+            this._orgHub = new StringBuffer(grsSite).append(_grm.owner())
                     .toString();
 
             this._repoHub =
                     new StringBuffer(_orgHub).append(SLASH)
                             .append(this._grm.name())
                             .toString();
-
 
             switch(_pp.grs) {
 
@@ -485,9 +493,6 @@ public class GitRepoRenderer {
             "beige", "black", "moon", "night", "sky", "white");
 
     private static final String GRS_GITHUB_COM = "https://github.com/";
-    private static final String GRS_GITLAB_COM = "https://gitlab.com/";
-    private static final String GRS_BITBUCKET_COM = "https://bitbucket.com/";
-
     private static final String GRS_GITHUB_STARS = "stargazers";
     private static final String GRS_GITHUB_FORKS = "network";
     private static final String GRS_GITLAB_STARS = "activity";

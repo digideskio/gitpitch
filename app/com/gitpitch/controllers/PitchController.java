@@ -280,10 +280,12 @@ public class PitchController extends Controller {
                         }
                         if (pp.isMaster()) {
                             log.info("markdown:  [ notfnd, online ] {}", pp);
-                            return ok(RFE.build(pp)).as("text/markdown");
+                            return ok(RFE.master(pp, grsManager.get(pp)))
+                                    .as("text/markdown");
                         } else {
                             log.info("markdown:  [ notfnd, online ] {}", pp);
-                            return ok(RFE.PITCHME_NOT_FOUND_ON_BRANCH).as("text/markdown");
+                            return ok(RFE.branch(pp, grsManager.get(pp)))
+                                    .as("text/markdown");
                         }
                     });
         }

@@ -34,6 +34,7 @@ public class GRS {
 
     private final String name;
     private final String type;
+    private final String site;
     private final String apiBase;
     private final String apiToken;
     private final String apiTokenHeader;
@@ -42,6 +43,7 @@ public class GRS {
 
     private GRS(String name,
                 String type,
+                String site,
                 String apiBase,
                 String apiToken,
                 String apiTokenHeader,
@@ -50,6 +52,7 @@ public class GRS {
 
         this.name = name;
         this.type = type;
+        this.site = site;
         this.apiBase = apiBase;
         this.apiToken = apiToken;
         this.apiTokenHeader = apiTokenHeader;
@@ -61,14 +64,16 @@ public class GRS {
 
         String name = grsCfg.get("name");
         String type = grsCfg.get("type");
+        String site = grsCfg.get("site");
         String apiBase = grsCfg.get("apibase");
         String apiToken = grsCfg.get("apitoken");
         String apiTokenHeader = grsCfg.get("apitokenheader");
         String rawBase = grsCfg.get("rawbase");
         boolean isDefault = Boolean.parseBoolean(grsCfg.get("default"));
 
-        if(name != null && type != null && apiBase != null && rawBase != null) {
-            return new GRS(name, type, apiBase, apiToken,
+        if(name != null && type != null && site != null &&
+                apiBase != null && rawBase != null) {
+            return new GRS(name, type, site, apiBase, apiToken,
                     apiTokenHeader, rawBase, isDefault);
         } else {
             return null;
@@ -77,6 +82,7 @@ public class GRS {
 
     public String getName() { return name; }
     public String getType() { return type; }
+    public String getSite() { return site; }
     public String getApiBase() { return apiBase; }
     public String getApiToken() { return apiToken; }
     public String getApiTokenHeader() { return apiTokenHeader; }
